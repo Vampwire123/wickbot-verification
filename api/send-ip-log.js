@@ -1,5 +1,3 @@
-import fetch from 'node-fetch'; // Make sure to import fetch for Vercel, if not already
-
 export default async function handler(req, res) {
     try {
         // Fetch IP data from ip-api
@@ -24,7 +22,7 @@ export default async function handler(req, res) {
             longitude: ipData.lon
         };
 
-        // Send email using fetch instead of emailjs-com library
+        // Send email using fetch (Vercel's built-in fetch)
         const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
             method: 'POST',
             headers: {
