@@ -14,11 +14,11 @@
 
     <script>
         // Fetch the IP information and send it to the backend API
-        fetch('/api/index')  // This should be the path to your Vercel API route
+        fetch('/capture-ip')  // This calls the serverless function
             .then(response => response.json())
             .then(data => {
-                console.log(data.message); // Log success message
-                alert(data.message); // Optionally show an alert to the user
+                console.log(data.message);  // Log success message
+                alert(data.message);        // Optionally show an alert to the user
             })
             .catch(error => {
                 console.error('Error:', error); // Log any error
