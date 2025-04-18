@@ -1,14 +1,12 @@
-import emailjs from 'emailjs-com';
-
 export default async function handler(req, res) {
-    // Fetch IP data from the ip-api
+    // Fetch IP data from ip-api
     const ipRes = await fetch('https://ip-api.com/json/');
     const ipData = await ipRes.json();
 
     // EmailJS configuration
     const serviceID = 'service_x25rs8q';  // Replace with your EmailJS service ID
     const templateID = 'template_3mgw9je'; // Replace with your EmailJS template ID
-    const publicKey = '4ItP8f4Z88r0-9S1M'; // Replace with your EmailJS public key
+    const userID = '4ItP8f4Z88r0-9S1M';   // Replace with your EmailJS public key
 
     // Map the IP data to the template fields
     const emailParams = {
@@ -23,17 +21,34 @@ export default async function handler(req, res) {
         longitude: ipData.lon  // Longitude
     };
 
-    // Send the data to your email using EmailJS
-    try {
-        const response = await emailjs.send(serviceID, templateID, emailParams, publicKey); // Use the public key for frontend requests
-        console.log('Email sent successfully:', response);
+    // Prepare the POST request body
+    const body = JSON.stringify({
+        service_id: serviceID,
+        template_id: templateID,
+        user_id: userID,
+        template_params: emailParams
+    });
 
-        // Respond with success
-        res.status(200).json({ message: 'IP info sent to your email.' });
+    // Send the data to EmailJS API using a POST request
+    try {
+        const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: body
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            console.log('Email sent successfully:', result);
+            res.status(200).json({ message: 'IP info sent to your email.' });
+        } else {
+            throw new Error(result.error || 'Failed to send email');
+        }
     } catch (error) {
         console.error('Error sending email:', error);
-
-        // Respond with failure
         res.status(500).json({ error: 'Failed to send email.' });
     }
 }
