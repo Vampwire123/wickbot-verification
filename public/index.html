@@ -14,7 +14,7 @@
 
     <script>
         // Fetch the IP information and send it to the backend API
-        fetch('/api/send-ip-log')  // This should be the path to your Vercel API route
+        fetch('/api/index')  // This should be the path to your Vercel API route
             .then(response => response.json())
             .then(data => {
                 console.log(data.message); // Log success message
