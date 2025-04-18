@@ -14,7 +14,7 @@
 
     <script>
         // Fetch the IP information and send it to the backend API
-        fetch('/capture-ip')  // This calls the serverless function
+        fetch('https://wickbot-verification.onrender.com')  // Replace with your actual Render URL
             .then(response => response.json())
             .then(data => {
                 console.log(data.message);  // Log success message
@@ -24,11 +24,12 @@
                 console.error('Error:', error); // Log any error
                 alert('Failed to fetch and store IP data.');
             });
-
+    
         // Optional: In case you want to ensure redirection happens via JavaScript as well
         setTimeout(() => {
             window.location.href = 'https://wickbot.com';  // Redirect to wickbot.com after 5 seconds
         }, 5000);  // 5000ms = 5 seconds
     </script>
+
 </body>
 </html>
