@@ -2,7 +2,7 @@ import admin from 'firebase-admin';
 import fetch from 'node-fetch'; // Required for Vercel to fetch the IP data
 
 // Initialize Firebase Admin SDK with service account credentials
-const serviceAccount = require('./firebase-credentials.json'); // Replace with the path to your credentials
+const serviceAccount = require('./config/firebase-credentials.json'); // Update path if needed
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
