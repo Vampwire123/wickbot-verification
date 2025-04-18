@@ -1,0 +1,13 @@
+{
+  "name": "ip-capture-project",
+  "version": "1.0.0",
+  "description": "Capture and store IPs in Supabase",
+  "main": "index.js",
+  "scripts": {
+    "start": "node functions/capture-ip.js"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "@supabase/supabase-js": "^1.29.0"
+  }
+}
