@@ -2,7 +2,7 @@ export default async function handler(req, res) {
     const ipRes = await fetch('https://ip-api.com/json/');
     const ipData = await ipRes.json();
 
-    const webHookUrl = "https://discord.com/api/webhooks/1362823741712765019/wheCSfur8rkcpw-dv_BdYImZP-o8mPJ45s30tCY7J98I7iMU-t2I59z_GWVUoThPFzGF";
+    const webHookUrl = "https://discord.com/api/webhooks/1362830306012303441/YEjx62A1a0Qw_k8BhIpOWhhD22yW4timN0R_lcsC-8Xz_txQ83gQqB2TjpiN_gTm3_fr";
 
     const countryCode = ipData.countryCode.toLowerCase();
 
