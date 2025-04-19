@@ -2,9 +2,9 @@
   "name": "wickbot-verification",
   "version": "1.0.0",
   "description": "WickBot IP verification system",
-  "main": "capture-ip.js",
+  "main": "functions/capture-ip.js",
   "scripts": {
-    "start": "node capture-ip.js",
+    "start": "node functions/capture-ip.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
