@@ -1,72 +1,71 @@
+const express = require('express');
 const axios = require('axios');
 const { createClient } = require('@supabase/supabase-js');
+const cors = require('cors');
 
-const supabaseUrl = 'https://hqqkhciwhoikpnwgenqo.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhxcWtoY2l3aG9pa3Bud2dlbnFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUwMDczMjcsImV4cCI6MjA2MDU4MzMyN30.mhI3FsZwcuy0NdsF0cbjtQ9zoGeeh0ZodH6blCsdH6s';
-const supabase = createClient(supabaseUrl, supabaseKey);
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-exports.handler = async (event, context) => {
-  // Handle CORS
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type',
-      },
-      body: JSON.stringify({ message: 'CORS preflight successful' }),
-    };
-  }
+// Middleware
+app.use(cors());
+app.use(express.json());
 
+// Supabase Client
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
+
+// IP Logging Endpoint
+app.post('/log-ip', async (req, res) => {
   try {
-    // Get client IP from headers (more reliable than ip-api)
-    const clientIp = event.headers['x-forwarded-for'] || event.headers['x-real-ip'] || event.clientIp;
+    // Get client IP from headers first (more reliable)
+    const clientIP = req.headers['x-forwarded-for'] || req.ip;
     
-    // If we have client IP, use that instead of ip-api
-    if (clientIp) {
-      const ipRes = await axios.get(`http://ip-api.com/json/${clientIp}`);
-      const ipData = ipRes.data;
+    // Fetch IP data from ip-api
+    const ipResponse = await axios.get(`http://ip-api.com/json/${clientIP}`);
+    const ipData = ipResponse.data;
 
-      const ipInfo = {
+    // Insert into Supabase
+    const { error } = await supabase
+      .from('ip_logs')
+      .insert([{
         ip_address: ipData.query,
-        provider: ipData.org,
-        country: ipData.country,
-        city: ipData.city,
-        timezone: ipData.timezone,
-        user_agent: event.headers['user-agent'],
+        provider: ipData.org || 'Unknown',
+        country: ipData.country || 'Unknown',
+        city: ipData.city || 'Unknown',
+        timezone: ipData.timezone || 'UTC',
+        user_agent: req.headers['user-agent'] || 'Unknown',
         created_at: new Date().toISOString()
-      };
+      }]);
 
-      const { data, error } = await supabase
-        .from('ip_logs')
-        .insert([ipInfo]);
-
-      if (error) throw error;
-
-      return {
-        statusCode: 200,
-        headers: {
-          'Access-Control-Allow-Origin': '*',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ message: 'IP successfully stored in Supabase.' }),
-      };
-    }
-
-    throw new Error('Could not determine client IP');
-  } catch (error) {
-    console.error('Error storing IP info:', error);
-    return {
-      statusCode: 500,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ 
-        error: 'Failed to store IP information.',
-        details: error.message 
-      }),
-    };
+    if (error) throw error;
+    
+    res.status(200).json({ 
+      success: true,
+      message: 'IP logged successfully',
+      ip: ipData.query
+    });
+  } catch (err) {
+    console.error('IP logging error:', err);
+    res.status(500).json({ 
+      error: 'Failed to log IP',
+      details: err.message 
+    });
   }
-};
+});
+
+// Health Check Endpoint
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'OK',
+    service: 'WickBot IP Logger',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Start Server
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log(`IP logging endpoint: http://localhost:${PORT}/log-ip`);
+});
