@@ -1,16 +1,19 @@
 {
-  "name": "ip-capture-project",
+  "name": "wickbot-verification",
   "version": "1.0.0",
-  "description": "Capture and store IPs in Supabase",
-  "main": "index.js",
+  "description": "WickBot IP verification system",
+  "main": "capture-ip.js",
   "scripts": {
-    "start": "node functions/capture-ip.js"
-{
+    "start": "node capture-ip.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "dependencies": {
     "express": "^4.18.2",
     "axios": "^1.6.2",
     "@supabase/supabase-js": "^2.39.0",
     "cors": "^2.8.5"
+  },
+  "engines": {
+    "node": "18.x"
   }
-}
 }
