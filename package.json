@@ -1,19 +1,13 @@
 {
   "name": "wickbot-verification",
   "version": "1.0.0",
-  "description": "WickBot IP verification system",
-  "main": "functions/capture-ip.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node functions/capture-ip.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js"
   },
   "dependencies": {
     "express": "^4.18.2",
-    "axios": "^1.6.2",
-    "@supabase/supabase-js": "^2.39.0",
-    "cors": "^2.8.5"
-  },
-  "engines": {
-    "node": "18.x"
+    "pg": "^8.11.3",
+    "path": "^0.12.7"
   }
 }
