@@ -14,8 +14,9 @@
 
     <script>
       // Fetch the IP information and send it to the backend API
-      fetch('https://wickbot-verification.onrender.com/.netlify/functions/capture-ip', {
-        method: 'POST',
+        fetch('https://wickbot-backend.onrender.com/log-ip', {
+          method: 'POST'
+        });
         headers: {
           'Content-Type': 'application/json',
         }
