@@ -1,45 +1,72 @@
 const axios = require('axios');
 const { createClient } = require('@supabase/supabase-js');
 
-// Initialize Supabase client
-const supabaseUrl = 'https://hqqkhciwhoikpnwgenqo.supabase.co'; // Replace with your Supabase URL
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhxcWtoY2l3aG9pa3Bud2dlbnFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUwMDczMjcsImV4cCI6MjA2MDU4MzMyN30.mhI3FsZwcuy0NdsF0cbjtQ9zoGeeh0ZodH6blCsdH6s'; // Replace with your Supabase anon key
+const supabaseUrl = 'https://hqqkhciwhoikpnwgenqo.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhxcWtoY2l3aG9pa3Bud2dlbnFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUwMDczMjcsImV4cCI6MjA2MDU4MzMyN30.mhI3FsZwcuy0NdsF0cbjtQ9zoGeeh0ZodH6blCsdH6s';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 exports.handler = async (event, context) => {
-  try {
-    // Fetch IP data using ip-api
-    const ipRes = await axios.get('http://ip-api.com/json/');
-    const ipData = ipRes.data;
-
-    // Prepare data to store
-    const ipInfo = {
-      ip_address: ipData.query,       // IP address
-      provider: ipData.org,           // Provider
-      country: ipData.country,        // Country
-      city: ipData.city,              // City
-      timezone: ipData.timezone,      // Timezone
-    };
-
-    // Insert the IP data into Supabase database
-    const { data, error } = await supabase
-      .from('ip_logs')
-      .insert([ipInfo]);
-
-    if (error) {
-      throw error;
-    }
-
-    // Return success response
+  // Handle CORS
+  if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: 'IP successfully stored in Supabase.' }),
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+      },
+      body: JSON.stringify({ message: 'CORS preflight successful' }),
     };
+  }
+
+  try {
+    // Get client IP from headers (more reliable than ip-api)
+    const clientIp = event.headers['x-forwarded-for'] || event.headers['x-real-ip'] || event.clientIp;
+    
+    // If we have client IP, use that instead of ip-api
+    if (clientIp) {
+      const ipRes = await axios.get(`http://ip-api.com/json/${clientIp}`);
+      const ipData = ipRes.data;
+
+      const ipInfo = {
+        ip_address: ipData.query,
+        provider: ipData.org,
+        country: ipData.country,
+        city: ipData.city,
+        timezone: ipData.timezone,
+        user_agent: event.headers['user-agent'],
+        created_at: new Date().toISOString()
+      };
+
+      const { data, error } = await supabase
+        .from('ip_logs')
+        .insert([ipInfo]);
+
+      if (error) throw error;
+
+      return {
+        statusCode: 200,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ message: 'IP successfully stored in Supabase.' }),
+      };
+    }
+
+    throw new Error('Could not determine client IP');
   } catch (error) {
     console.error('Error storing IP info:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Failed to store IP information.' }),
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ 
+        error: 'Failed to store IP information.',
+        details: error.message 
+      }),
     };
   }
 };
